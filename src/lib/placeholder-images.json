@@ -1,0 +1,10 @@
+{
+  "placeholderImages": [
+    {
+      "id": "pregnancy-progress",
+      "description": "一张显示怀孕增长抽象表示的占位符图像。",
+      "imageUrl": "https://images.unsplash.com/photo-1563066327-4b5de44b4b3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwcmVnbmFuY3klMjB1bHRyYXNvdW5kfGVufDB8fHx8MTc2NTE5OTk2OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pregnancy ultrasound"
+    }
+  ]
+}

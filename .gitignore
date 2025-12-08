@@ -16,7 +16,7 @@
 # next.js
 /.next/
 /out/
-
+/.idea/copilot.data.migration.agent.xml
 # production
 /build
 
