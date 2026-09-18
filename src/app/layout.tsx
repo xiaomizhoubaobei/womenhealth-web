@@ -2,9 +2,18 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
+/**
+ * 全局默认元信息。
+ *
+ * title.template 让子页面（如首页 page.tsx 的 generateMetadata）自动拼出
+ * 「页面标题 | LuminCore」，避免每页手写站点名。
+ */
 export const metadata: Metadata = {
-    title: 'LuminCore',
-    description: "一款全面的女性生殖健康和保健追踪器。",
+    title: {
+        default: 'LuminCore',
+        template: '%s | LuminCore',
+    },
+    description: '一款全面的女性生殖健康和保健追踪器。',
 };
 
 /**
