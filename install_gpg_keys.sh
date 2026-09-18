@@ -1,6 +1,33 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ==============================================================================
+# GPG 密钥安装脚本
+#
+# 说明：分发 API 地址与私钥解锁短语（passphrase）均从环境变量读取，
+#      严禁在脚本中硬编码，避免密钥分发链路与口令泄露。
+#
+# 环境变量：
+#   GPG_API / PLUGIN_GPG_API   密钥分发 API 地址（必填）
+#   GPG_KEY / PLUGIN_GPG_KEY   私钥解锁短语 passphrase（必填，私钥为加密存储）
+# ==============================================================================
+
+# 从环境变量读取分发 API 地址（优先 PLUGIN_ 前缀，兼容 CNB 注入规范）
+API_URL="${PLUGIN_GPG_API:-${GPG_API:-}}"
+# 从环境变量读取私钥解锁短语（passphrase）
+GPG_KEY_VALUE="${PLUGIN_GPG_KEY:-${GPG_KEY:-}}"
+
+# 0. 环境变量校验
+if [ -z "$API_URL" ]; then
+    echo "❌ 未设置密钥分发 API 环境变量（GPG_API / PLUGIN_GPG_API）"
+    exit 1
+fi
+
+if [ -z "$GPG_KEY_VALUE" ]; then
+    echo "❌ 未设置私钥解锁短语环境变量（GPG_KEY / PLUGIN_GPG_KEY）"
+    exit 1
+fi
+
 # 1. 安装必要工具（若未安装）
 if ! command -v gpg &>/dev/null; then
     echo "==> 安装 GPG..."
@@ -9,7 +36,6 @@ if ! command -v gpg &>/dev/null; then
 fi
 
 # 2. 从 API 获取密钥下载地址
-API_URL="https://1329111128-j4hombe7rr.in.ap-guangzhou.tencentscf.com"
 echo "==> 获取密钥地址..."
 API_RESPONSE=$(curl -s --connect-timeout 10 --max-time 30 "$API_URL")
 if [ -z "$API_RESPONSE" ]; then
@@ -31,9 +57,9 @@ echo "==> 下载密钥..."
 wget -q -O "$PRIVATE_KEY_FILE" "$PRIVATE_KEY_URL"
 wget -q -O "$PUBLIC_KEY_FILE" "$PUBLIC_KEY_URL"
 
-# 4. 导入密钥
+# 4. 导入密钥（私钥为加密存储，须用环境变量中的 passphrase 解锁导入）
 echo "==> 导入密钥..."
-gpg --batch --import "$PRIVATE_KEY_FILE"
+gpg --batch --pinentry-mode loopback --passphrase "$GPG_KEY_VALUE" --import "$PRIVATE_KEY_FILE"
 gpg --batch --import "$PUBLIC_KEY_FILE"
 
 # 5. 获取密钥 ID 并设为终极信任
