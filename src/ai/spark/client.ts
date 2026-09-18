@@ -24,6 +24,7 @@ import {
     type SparkConfig,
 } from './config';
 import {buildSparkAuthUrl} from './auth';
+import {logger} from '@/lib/logger';
 
 // 本地开发时从 .env 读取密钥；平台部署时由环境变量 / 密钥仓库注入。
 loadDotenv();
@@ -210,7 +211,7 @@ export async function sparkChat(
 
             // 指数退避：1s / 2s，给鉴权时间偏差与服务端瞬时故障留出恢复窗口。
             const backoffMs = 1000 * 2 ** attempt;
-            console.warn(
+            logger.warn(
                 `[spark] 第 ${attempt + 1} 次调用失败，${backoffMs}ms 后重试：`,
                 error instanceof Error ? error.message : error
             );

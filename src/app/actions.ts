@@ -25,6 +25,8 @@ import type {
     PredictFutureCyclesInput,
 } from '@/lib/ai-types';
 
+import { logger } from '@/lib/logger';
+
 /**
  * 获取周期预测。
  * @param input - 预测未来周期的输入数据。
@@ -35,7 +37,7 @@ export async function getCyclePrediction(input: PredictFutureCyclesInput) {
         const result = await runCyclePrediction(input);
         return { success: true, data: result };
     } catch (error) {
-        console.error('[actions] 获取周期预测失败：', error);
+        logger.error('[actions] 获取周期预测失败：', error);
         return { success: false, error: '获取周期预测失败。' };
     }
 }
@@ -50,7 +52,7 @@ export async function getSymptomAnalysis(input: AnalyzeSymptomsInput) {
         const result = await runSymptomAnalysis(input);
         return { success: true, data: result };
     } catch (error) {
-        console.error('[actions] 获取症状分析失败：', error);
+        logger.error('[actions] 获取症状分析失败：', error);
         return { success: false, error: '获取症状分析失败。' };
     }
 }
@@ -65,7 +67,7 @@ export async function getPersonalizedRecommendations(input: PersonalizedRecommen
         const result = await runPersonalizedRecommendations(input);
         return { success: true, data: result };
     } catch (error) {
-        console.error('[actions] 获取个性化建议失败：', error);
+        logger.error('[actions] 获取个性化建议失败：', error);
         return { success: false, error: '获取个性化建议失败。' };
     }
 }

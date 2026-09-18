@@ -19,6 +19,8 @@ import {
     type PredictFutureCyclesOutput,
 } from '@/lib/ai-types';
 
+import { logger } from '@/lib/logger';
+
 /** 单次请求超时（毫秒）。星火侧本身约 60s 超时，这里留出少量余量。 */
 const REQUEST_TIMEOUT_MS = 90_000;
 
@@ -67,7 +69,7 @@ async function requestAi<TInput, TOutput>(
         if (error instanceof DOMException && error.name === 'AbortError') {
             return { success: false, error: TIMEOUT_MESSAGE };
         }
-        console.error('[ai-client] 请求服务端 AI 接口失败：', error);
+        logger.error('[ai-client] 请求服务端 AI 接口失败：', error);
         return { success: false, error: NETWORK_ERROR_MESSAGE };
     } finally {
         clearTimeout(timer);

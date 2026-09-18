@@ -10,6 +10,7 @@
 
 import { NextResponse } from 'next/server';
 import type { AiApiResponse } from '@/lib/ai-types';
+import { logger } from '@/lib/logger';
 
 /** 请求体上限（字符），防止超大 payload 直接打到模型接口。 */
 const MAX_BODY_CHARS = 100_000;
@@ -66,11 +67,11 @@ export async function handleAiRequest<T>(
 
         // 密钥缺失属于部署配置问题：把缺失变量名透出去，便于运维快速定位，且不包含任何密钥明文。
         if (message.includes('缺少讯飞星火配置')) {
-            console.error('[api/ai] 星火配置缺失：', message);
+            logger.error('[api/ai] 星火配置缺失：', message);
             return NextResponse.json<AiApiResponse<T>>({ success: false, error: message });
         }
 
-        console.error('[api/ai] 调用失败：', error);
+        logger.error('[api/ai] 调用失败：', error);
         return NextResponse.json<AiApiResponse<T>>({ success: false, error: clientErrorMessage });
     }
 }

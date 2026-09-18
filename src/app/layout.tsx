@@ -32,6 +32,8 @@ export default function RootLayout({
         <head>
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+            {/* 该规则面向 Pages Router 的 '单页加载' 问题；App Router 根布局中此处为全局字体，属推荐用法 */}
+            {/* eslint-disable-next-line @next/next/no-page-custom-font */}
             <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@400;500;700&display=swap" rel="stylesheet" />
         </head>
         <body className="font-body antialiased">

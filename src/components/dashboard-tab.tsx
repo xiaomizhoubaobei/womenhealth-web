@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import type { DateRange } from 'react-day-picker';
+import type {
+    DateRange,
+    Matcher,
+    ModifiersStyles,
+} from 'react-day-picker';
 import { format } from 'date-fns';
 import {
     Card,
@@ -144,11 +148,13 @@ export function DashboardTab({
         }
     };
 
-    const modifiers = {
+    // 经期范围修饰符：每个 cycleLog 映射为一个日期区间（v9 使用 Matcher 数组表达区间）
+    const modifiers: Record<string, Matcher[]> = {
         period: cycleLogs.map((log) => ({ from: log.startDate, to: log.endDate })),
     };
 
-    const modifiersStyles = {
+    // 经期范围的自定义样式，使用 react-day-picker 的 ModifiersStyles 类型而非 any
+    const modifiersStyles: ModifiersStyles = {
         period: {
             backgroundColor: 'var(--colors-accent)',
             color: 'var(--colors-accent-foreground)',
@@ -172,7 +178,7 @@ export function DashboardTab({
                         selected={periodDates}
                         onSelect={setPeriodDates}
                         modifiers={modifiers}
-                        modifiersStyles={modifiersStyles as any}
+                        modifiersStyles={modifiersStyles}
                         className="rounded-md border"
                     />
                     <div className="space-y-2">
