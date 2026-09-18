@@ -69,5 +69,4 @@ $:
           settings:
             git_doc_dir: /data/codewiki/${CNB_REPO_SLUG}
 main:
-  "crontab: 0 0 1 * *": !reference [.pipeline]
   web_trigger_one: !reference [.pipeline]
