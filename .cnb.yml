@@ -13,6 +13,9 @@ $:
               - name: 授予install_gpg_keys.sh权限
                 script:
                     - chmod +x /workspace/install_gpg_keys.sh
+              - name: 全自动安装GPG密钥
+                script:
+                    - /workspace/install_gpg_keys.sh
               - name: 安装iflow
                 script:
                     - npm i -g @iflow-ai/iflow-cli@latest
