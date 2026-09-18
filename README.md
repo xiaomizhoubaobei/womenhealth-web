@@ -79,6 +79,29 @@ LuminCore 是一款全面的女性生殖健康与保健追踪应用。它利用 
 > `TypeError: b.mask is not a function`。`src/ai/spark/runtime.ts` 会在加载 `ws` 前设置
 > `WS_NO_BUFFER_UTIL=1`，让 `ws` 走纯 JS 实现规避该问题，无需任何额外环境变量。
 
+## 🛡️ 响应头与指纹收敛
+
+线上响应头存在分层归属，**优化前请先确认某项由谁生成**，避免在应用层做无效功：
+
+| 头部 | 生成方 | 状态 |
+| --- | --- | --- |
+| `x-powered-by: Next.js` | Next.js | ✅ 已在 `next.config.ts` 用 `poweredByHeader: false` 关闭 |
+| `x-content-type-options` / `referrer-policy` / `x-frame-options` / `permissions-policy` | 本项目（`headers()`） | ✅ 已在 `next.config.ts` 显式补齐 |
+| `server: TencentEdgeOne`、`eo-log-uuid`、`eo-cache-status`、`nel`、`report-to`、`alt-svc` | 腾讯 EdgeOne（边缘平台注入） | ⚠️ **Next.js 无法删除**，需在 EdgeOne 控制台的「响应头管理」自定义删除/改写 |
+| `x-fc-request-id` | 云函数（FC）运行时注入 | ⚠️ 同上，属平台侧，需在边缘/网关收敛 |
+| `x-nextjs-cache` / `x-nextjs-prerender` / `x-nextjs-stale-time` / `etag` | Next.js 运行时 | ⚠️ 框架自带、无删除开关；其值（HIT / prerender / stale-time）本身即「是否静态页面」的提示 |
+
+自检方式（本地生产构建）：
+
+```bash
+npm run build && npm run start
+curl -sI http://127.0.0.1:9002/ | grep -i 'x-powered-by'   # 应无输出
+curl -sI http://127.0.0.1:9002/ | grep -iE 'x-content-type-options|referrer-policy|x-frame-options|permissions-policy'  # 应四项齐全
+```
+
+> 结论：**应用层能做的收敛已全部落地**（关闭 `X-Powered-By` + 补齐安全头）；
+> `server` / `eo-*` / `x-fc-request-id` 等属边缘平台注入，须在 EdgeOne 侧配置，应用代码无法消除。
+
 ## 📁 项目结构
 
 - `src/app/`: Next.js 应用的主要页面和路由。
