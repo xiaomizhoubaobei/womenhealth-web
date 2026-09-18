@@ -13,38 +13,10 @@
 
 import {composePrompt, sparkChat} from '@/ai/spark/client';
 import {parseJsonFromText} from '@/ai/spark/json';
-
-/**
- * 个性化建议输入。
- */
-export interface PersonalizedRecommendationsInput {
-    /** 月经周期数据，包括经期日期、流量强度和症状。 */
-    cycleData: string;
-    /** 生育迹象数据，如基础体温和宫颈粘液观察。 */
-    fertilityData: string;
-    /** 怀孕相关数据，如果适用。 */
-    pregnancyData?: string;
-    /** 症状分析数据，提供对潜在健康问题的见解。 */
-    symptomAnalysis: string;
-}
-
-/**
- * 单条建议。
- */
-export interface RecommendationItem {
-    /** 建议类型（生活方式、咨询等）。 */
-    type: string;
-    /** 建议的详细描述。 */
-    description: string;
-}
-
-/**
- * 个性化建议输出。
- */
-export interface PersonalizedRecommendationsOutput {
-    /** 个性化健康建议列表。 */
-    recommendations: RecommendationItem[];
-}
+import type {
+    PersonalizedRecommendationsInput,
+    PersonalizedRecommendationsOutput,
+} from '@/lib/ai-types';
 
 /** 单条建议的字符上限，防止模型输出过长的段落挤爆界面。 */
 const MAX_DESCRIPTION_CHARS = 400;

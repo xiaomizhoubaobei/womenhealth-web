@@ -15,6 +15,7 @@ LuminCore 是一款全面的女性生殖健康与保健追踪应用。它利用 
 - **框架**: [Next.js](https://nextjs.org/) (使用 App Router)
 - **UI**: [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [ShadCN UI](https://ui.shadcn.com/), [Tailwind CSS](https://tailwindcss.com/)
 - **AI 功能**: [讯飞星火认知大模型 Lite](https://www.xfyun.cn/doc/spark/Web.html)（WebSocket 流式接口）
+  - **调用模式**: 服务端 / 客户端分离 —— 浏览器**不持有任何密钥**，只请求本站服务端接口；密钥与 WebSocket 握手全部在服务端完成（详见下文「AI 调用链路」）。
 - **图标**: [Lucide React](https://lucide.dev/guide/packages/lucide-react)
 
 ## 🛠️ 如何开始
@@ -51,6 +52,33 @@ LuminCore 是一款全面的女性生殖健康与保健追踪应用。它利用 
     npm run build
     ```
 
+## 🔐 AI 调用链路（服务端持有认证信息）
+
+浏览器**永远拿不到** `SPARK_APP_ID` / `SPARK_API_KEY` / `SPARK_API_SECRET`：
+
+```
+客户端组件（'use client'）
+  └─ src/lib/ai-client.ts        fetch POST（只发业务数据）
+       └─ src/app/api/ai/*       Route Handler（运行时 nodejs），服务端读取密钥
+            └─ src/ai/service.ts 服务端 AI 入口
+                 └─ src/ai/flows/* 提示词构建 + 输出校验
+                      └─ src/ai/spark/{auth,client} HMAC 签名 + WebSocket 调用
+                           └─ 讯飞星火 Lite
+```
+
+约定与要点：
+
+- **客户端只认路径**：`/api/ai/symptom-analysis`、`/api/ai/cycle-prediction`、`/api/ai/recommendations`。
+- **接口结构统一**：成功 `{success:true, data}`，失败 `{success:false, error}`（业务失败返回 HTTP 200，前端判定逻辑与改造前一致）。
+- **服务端二次校验**：请求体结构、必填字段、日期格式、周期数范围等在后端兜底，前端表单校验不可信。
+- **类型单一来源**：前后端共用 `src/lib/ai-types.ts`；`src/ai/**` 属服务端模块（`'use server'` + `ws` + `node:crypto`），**禁止**被客户端组件 import。
+- **Server Action 亦可用**：`src/app/actions.ts` 保留为服务端调用入口（与服务端接口共用 `src/ai/service.ts`），供服务端组件等场景使用。
+- 自检：`npm run build` 后 `grep -rl 'SPARK_API_SECRET\|spark-api.xf-yun.com' .next/static` 应为 **0 命中**。
+
+> 运行时补丁：Next 打包会把 `ws` 的可选原生加速依赖 `bufferutil` 替换为空模块，导致发送掩码帧报
+> `TypeError: b.mask is not a function`。`src/ai/spark/runtime.ts` 会在加载 `ws` 前设置
+> `WS_NO_BUFFER_UTIL=1`，让 `ws` 走纯 JS 实现规避该问题，无需任何额外环境变量。
+
 ## 📁 项目结构
 
 - `src/app/`: Next.js 应用的主要页面和路由。
@@ -59,5 +87,9 @@ LuminCore 是一款全面的女性生殖健康与保健追踪应用。它利用 
 - `src/ai/`: 所有与 AI 能力相关的文件。
   - `src/ai/spark/`: 讯飞星火 Lite 接入层（`auth.ts` 鉴权签名、`client.ts` WebSocket 调用、`json.ts` 结构化输出解析）。
   - `src/ai/flows/`: 应用中的核心 AI 能力（症状分析、周期预测、个性化建议）。
+  - `src/ai/service.ts`: 服务端 AI 能力统一入口（Service Action / Route Handler 共用）。
+  - `src/app/api/ai/`: 服务端 AI 接口（Route Handler，Node.js 运行时），浏览器唯一可见的 AI 入口。
+- `src/lib/ai-types.ts`: AI 输入 / 输出类型与接口路径常量（前后端共用的**纯类型**，无任何服务端实现）。
+- `src/lib/ai-client.ts`: 客户端 AI 调用层（浏览器侧 `fetch` 封装，禁止引入服务端模块）。
 - `scripts/browser-check.js`: 星火鉴权与 WebSocket 连通性自检脚本。
 - `src/lib/`: 工具函数、类型定义和静态数据。

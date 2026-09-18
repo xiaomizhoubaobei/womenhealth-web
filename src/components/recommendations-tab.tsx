@@ -11,8 +11,8 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import type { CycleLog, FertilityLog } from '@/lib/types';
-import { getPersonalizedRecommendations } from '@/app/actions';
-import { PersonalizedRecommendationsOutput } from '@/ai/flows/personalized-recommendations';
+import { requestPersonalizedRecommendations } from '@/lib/ai-client';
+import type { PersonalizedRecommendationsOutput } from '@/lib/ai-types';
 import { Loader2, Sparkles } from 'lucide-react';
 
 /**
@@ -62,7 +62,7 @@ export function RecommendationsTab({
             symptomAnalysis: '无直接症状分析，但可从日志中推断。',
         };
 
-        const result = await getPersonalizedRecommendations(input);
+        const result = await requestPersonalizedRecommendations(input);
         setIsLoading(false);
 
         if (result.success && result.data) {
@@ -75,7 +75,7 @@ export function RecommendationsTab({
             toast({
                 variant: 'destructive',
                 title: '生成失败',
-                description: result.error,
+                description: result.success ? '服务端未返回结果。' : result.error,
             });
         }
     };

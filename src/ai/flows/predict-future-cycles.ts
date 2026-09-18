@@ -13,40 +13,10 @@
 
 import {composePrompt, sparkChat} from '@/ai/spark/client';
 import {parseJsonFromText} from '@/ai/spark/json';
-
-/**
- * 周期预测输入。
- */
-export interface PredictFutureCyclesInput {
-    /** 月经周期的典型长度（天）。 */
-    cycleLength: number;
-    /** 经期的典型长度（天）。 */
-    periodLength: number;
-    /** 要预测的未来周期数。 */
-    numberOfCycles: number;
-    /** 上次月经开始的日期 (YYYY-MM-DD)。 */
-    lastPeriodStartDate: string;
-}
-
-/**
- * 单个预测出的周期。
- */
-export interface PredictedCycle {
-    /** 预测的周期开始日期 (YYYY-MM-DD)。 */
-    startDate: string;
-    /** 预测的周期结束日期 (YYYY-MM-DD)。 */
-    endDate: string;
-    /** 预测的周期排卵日期 (YYYY-MM-DD)。 */
-    ovulationDate: string;
-}
-
-/**
- * 周期预测输出。
- */
-export interface PredictFutureCyclesOutput {
-    /** 预测出的周期列表。 */
-    predictedCycles: PredictedCycle[];
-}
+import type {
+    PredictFutureCyclesInput,
+    PredictFutureCyclesOutput,
+} from '@/lib/ai-types';
 
 /** YYYY-MM-DD 日期格式校验。 */
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;

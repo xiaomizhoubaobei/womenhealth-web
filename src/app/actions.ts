@@ -1,8 +1,29 @@
 'use server';
 
-import { analyzeSymptoms, AnalyzeSymptomsInput } from "@/ai/flows/analyze-symptoms";
-import { generatePersonalizedRecommendations, PersonalizedRecommendationsInput } from "@/ai/flows/personalized-recommendations";
-import { predictFutureCycles, PredictFutureCyclesInput } from "@/ai/flows/predict-future-cycles";
+/**
+ * @fileOverview AI 相关 Server Action（对外唯一动作入口）。
+ *
+ * 调用链：客户端组件 → 本文件（Server Action）→ `src/ai/service.ts` → 星火 Lite。
+ *
+ * 为什么保留 Server Action：
+ * - Server Action 由 Next.js 在**服务端**执行，浏览器只会拿到「动作引用」而非实现，
+ *   因此认证信息（SPARK_APP_ID / SPARK_API_KEY / SPARK_API_SECRET）不会下发到客户端；
+ * - 同时提供 REST 形态的 `/api/ai/*`（客户端调用层见 `src/lib/ai-client.ts`），
+ *   两类调用方共用同一服务端实现，避免逻辑分叉。
+ *
+ * 注意：本文件仅供服务端组件 / 其他服务端代码使用；浏览器组件请统一走 `src/lib/ai-client.ts`。
+ */
+
+import {
+    runCyclePrediction,
+    runPersonalizedRecommendations,
+    runSymptomAnalysis,
+} from '@/ai/service';
+import type {
+    AnalyzeSymptomsInput,
+    PersonalizedRecommendationsInput,
+    PredictFutureCyclesInput,
+} from '@/lib/ai-types';
 
 /**
  * 获取周期预测。
@@ -11,10 +32,10 @@ import { predictFutureCycles, PredictFutureCyclesInput } from "@/ai/flows/predic
  */
 export async function getCyclePrediction(input: PredictFutureCyclesInput) {
     try {
-        const result = await predictFutureCycles(input);
+        const result = await runCyclePrediction(input);
         return { success: true, data: result };
     } catch (error) {
-        console.error(error);
+        console.error('[actions] 获取周期预测失败：', error);
         return { success: false, error: '获取周期预测失败。' };
     }
 }
@@ -26,10 +47,10 @@ export async function getCyclePrediction(input: PredictFutureCyclesInput) {
  */
 export async function getSymptomAnalysis(input: AnalyzeSymptomsInput) {
     try {
-        const result = await analyzeSymptoms(input);
+        const result = await runSymptomAnalysis(input);
         return { success: true, data: result };
     } catch (error) {
-        console.error(error);
+        console.error('[actions] 获取症状分析失败：', error);
         return { success: false, error: '获取症状分析失败。' };
     }
 }
@@ -41,10 +62,10 @@ export async function getSymptomAnalysis(input: AnalyzeSymptomsInput) {
  */
 export async function getPersonalizedRecommendations(input: PersonalizedRecommendationsInput) {
     try {
-        const result = await generatePersonalizedRecommendations(input);
+        const result = await runPersonalizedRecommendations(input);
         return { success: true, data: result };
     } catch (error) {
-        console.error(error);
+        console.error('[actions] 获取个性化建议失败：', error);
         return { success: false, error: '获取个性化建议失败。' };
     }
 }

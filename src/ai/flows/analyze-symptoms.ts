@@ -13,26 +13,10 @@
 
 import {composePrompt, sparkChat} from '@/ai/spark/client';
 import {parseJsonFromText} from '@/ai/spark/json';
-
-/**
- * 症状分析输入（放宽为可选字段，避免调用方传 undefined 时被 zod 拒绝）。
- */
-export interface AnalyzeSymptomsInput {
-    /** 所经历症状的详细描述。 */
-    symptoms: string;
-    /** 可选：关于用户周期的数据，如平均长度或任何不规则性。 */
-    cycleData?: string;
-}
-
-/**
- * 症状分析输出。
- */
-export interface AnalyzeSymptomsOutput {
-    /** 对症状和潜在健康问题的分析。 */
-    analysis: string;
-    /** 基于症状分析的个性化见解和建议。 */
-    recommendations: string;
-}
+import type {
+    AnalyzeSymptomsInput,
+    AnalyzeSymptomsOutput,
+} from '@/lib/ai-types';
 
 /** 模型输出必须遵守的 JSON 结构说明。 */
 const OUTPUT_CONTRACT = `严格只输出一个 JSON 对象，不要输出任何解释文字或 Markdown 代码块，结构如下：

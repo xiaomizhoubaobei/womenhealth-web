@@ -20,10 +20,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { getCyclePrediction } from '@/app/actions';
+import { requestCyclePrediction } from '@/lib/ai-client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { PredictFutureCyclesOutput } from '@/ai/flows/predict-future-cycles';
+import type { PredictFutureCyclesOutput } from '@/lib/ai-types';
 import { format, parseISO } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { zhCN } from 'date-fns/locale';
@@ -63,7 +63,7 @@ export function CyclePredictionTab() {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         setPrediction(null);
-        const result = await getCyclePrediction(values);
+        const result = await requestCyclePrediction(values);
         setIsLoading(false);
 
         if (result.success && result.data) {
@@ -76,7 +76,7 @@ export function CyclePredictionTab() {
             toast({
                 variant: 'destructive',
                 title: '预测失败',
-                description: result.error,
+                description: result.success ? '服务端未返回结果。' : result.error,
             });
         }
     }

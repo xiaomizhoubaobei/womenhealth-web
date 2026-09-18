@@ -12,6 +12,8 @@
  */
 
 import {config as loadDotenv} from 'dotenv';
+// 必须先引入运行时补丁（设置 WS_NO_BUFFER_UTIL），再引入 ws，详见 runtime.ts 注释。
+import './runtime';
 import WebSocket from 'ws';
 import {
     SPARK_LITE_DOMAIN,

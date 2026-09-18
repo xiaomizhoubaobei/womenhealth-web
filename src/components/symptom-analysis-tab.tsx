@@ -20,10 +20,10 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { getSymptomAnalysis } from '@/app/actions';
+import { requestSymptomAnalysis } from '@/lib/ai-client';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { AnalyzeSymptomsOutput } from '@/ai/flows/analyze-symptoms';
+import type { AnalyzeSymptomsOutput } from '@/lib/ai-types';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
@@ -57,7 +57,7 @@ export function SymptomAnalysisTab() {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         setAnalysis(null);
-        const result = await getSymptomAnalysis(values);
+        const result = await requestSymptomAnalysis(values);
         setIsLoading(false);
 
         if (result.success && result.data) {
@@ -70,7 +70,7 @@ export function SymptomAnalysisTab() {
             toast({
                 variant: 'destructive',
                 title: '分析失败',
-                description: result.error,
+                description: result.success ? '服务端未返回结果。' : result.error,
             });
         }
     }
