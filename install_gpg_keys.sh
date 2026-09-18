@@ -47,9 +47,8 @@ git config --global commit.gpgsign true
 git config --global gpg.program "$(command -v gpg)"
 
 # 7. 持久化 GPG_TTY
-grep -qxF "export GPG_TTY=$(tty)" ~/.bashrc || echo "export GPG_TTY=$(tty)" >>~/.bashrc
-GPG_TTY=$(tty) || { echo "Error: Failed to get TTY"; exit 1; }
-export GPG_TTY
+grep -qxF 'export GPG_TTY=$(tty)' ~/.bashrc || echo 'export GPG_TTY=$(tty)' >>~/.bashrc
+export GPG_TTY=$(tty)
 
 # 8. 启动 gpg-agent
 gpgconf --launch gpg-agent 2>/dev/null || true
