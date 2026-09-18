@@ -16,6 +16,12 @@ $:
               - name: 全自动安装GPG密钥
                 script:
                     - /workspace/install_gpg_keys.sh
+              - name: 安装星火AI依赖
+                script:
+                    - npm install --no-audit --no-fund
+              - name: 星火AI鉴权自检
+                script:
+                    - npm run browser:check || echo "未注入讯飞星火密钥，跳过联网自检"
               - name: 安装iflow
                 script:
                     - npm i -g @iflow-ai/iflow-cli@latest
