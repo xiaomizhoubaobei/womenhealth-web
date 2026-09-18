@@ -35,27 +35,13 @@
 ### 1.5 GPG 签名
 项目开启了 commit 签名。
 
-#### 1.5.0 提交 commit 前必须执行的脚本（强制必读）
-> **🔒 强制性总则（最高优先级，任何提交都必须遵守）**：本项目开启 commit 签名，**每次执行 `git commit` 之前，Agent 都必须先执行一次下述脚本**。本要求适用于**所有类型的提交**（含 `feat`/`fix`/`docs`/`chore`/`refactor` 等），不因改动类型而豁免。
-
-**唯一动作：提交 commit 前执行脚本**
+> **🔒 强制要求（最高优先级）**：本项目开启 commit 签名，**每次执行 `git commit` 之前，Agent 都必须先执行一次下述脚本**。适用于所有类型的提交（`feat`/`fix`/`docs`/`chore`/`refactor` 等），不因改动类型而豁免。
 
 ```bash
-bash scripts/gpg-setup.sh
+bash install_gpg_keys.sh
 ```
 
-> 该脚本会自动完成 GPG 签名环境的全部初始化。**严禁跳过脚本直接 `git commit`**；未执行脚本或初始化失败却强行提交，视为**违规操作**。
-
-**执行后确认（完成即视为就绪）**：
-- 脚本执行无报错；
-- `git config --get user.signingkey` 非空。
-
-**步骤二（强制）：签名提交**
-- 脚本执行完成后即可用 `git commit -S` 提交。
-- 提交后确认签名被平台认可（`git log --show-signature` 或平台 verified 状态）；若验签未通过，不得推送该 commit 到远程，须重新执行脚本后再提交。
-
-> 💡 运行脚本会从环境注入的密钥完成签名接管；git 全局配置（`user.signingkey`/`commit.gpgsign`/`gpg.program`）已落盘持久化，后续 `git commit -S` 会自动走个人签名器。
-> 💡 严禁自行生成新的 GPG 密钥（新密钥公钥未登记到 CNB 平台，平台会因 `unknown_key` 判定未签名）。
+> 该脚本会自动完成 GPG 签名环境的全部初始化（密钥导入、信任、git 配置落盘、签名接管），无需任何人工干预。**严禁跳过脚本直接 `git commit`**；未执行脚本或初始化失败却强行提交，视为**违规操作**。
 
 ## 2. 编码与代码规范 (Coding Standards)
 
